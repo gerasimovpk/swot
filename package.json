@@ -1,0 +1,21 @@
+{
+  "name": "swot-ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm start\" \"npm run client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.4.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
