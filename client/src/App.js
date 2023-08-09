@@ -12,15 +12,24 @@ function App() {
         setMessage(data.message);
     }
 
+    const handleScroll = () => {
+        const questionnaireSection = document.getElementById("questionnaire-section");
+        questionnaireSection.scrollIntoView({ behavior: "smooth" });
+    }
+    
+
     return (
         <div className="App">
             <header className="App-header">
-                {/* <h1>Discover Your Business Strengths & Get Actionable Insights</h1> */}
-                <h1>Раскройте потенциал вашего бизнеса!</h1>
+                <h1>Discover Your Business Strengths & Get Actionable Insights</h1>
+                
+                <button className="scroll-button" onClick={handleScroll}>
+                    ⬇️
+                </button>
             </header>
 
             <Questionnaire/>
-            
+
         </div>
     );
 }
