@@ -15,10 +15,12 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <button onClick={fetchMessage}>Get Message</button>
-                <p>{message}</p>
+                {/* <h1>Discover Your Business Strengths & Get Actionable Insights</h1> */}
+                <h1>Раскройте потенциал вашего бизнеса!</h1>
             </header>
+
             <Questionnaire/>
+            
         </div>
     );
 }

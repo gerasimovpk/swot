@@ -1,15 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const swotRouter = require('./swotRouter.js');
+
 const app = express();
+
+app.use(express.json()); // For parsing application/json
+app.use(swotRouter);
+
 const PORT = 3001;
 
 app.get('/api/hello', (req, res) => {
     res.json({ message: 'Hello from the server!' });
-});
-
-app.post('/api/submit', (req, res) => {
-    const answers = req.body;
-    res.json({ message: "Successfully received answers!" });
 });
 
 app.listen(PORT, () => {

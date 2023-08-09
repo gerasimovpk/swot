@@ -1,0 +1,48 @@
+.matrix-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* divides the grid into 2 columns */
+    gap: 20px; /* space between the squares */
+    width: 100%;
+    max-width: 600px; /* or whatever maximum width you prefer */
+    margin: 0 auto; /* centers the matrix */
+}
+
+.feedback-box {
+    padding: 20px;
+    border-radius: 10px; /* rounded corners */
+    color: white; /* text color */
+    min-height: 150px; /* ensures each box has a minimum height */
+}
+
+.feedback-box.strengths {
+    background-color: #4caf50; /* Green for strengths */
+}
+
+.feedback-box.weaknesses {
+    background-color: #f44336; /* Red for weaknesses */
+}
+
+.feedback-box.opportunities {
+    background-color: #ff9800; /* Orange for opportunities */
+}
+
+.feedback-box.threats {
+    background-color: #2196f3; /* Blue for threats */
+}
+
+.feedback-title {
+    font-weight: bold;
+    margin-bottom: 10px; /* space between the title and the list */
+}
+
+.feedback-list {
+    list-style-type: disc; /* Add bullet points */
+    padding-left: 20px; /* Space for the bullet points */
+    margin: 0; /* Remove default margin */
+    text-align: left; /* Align text to the left */
+}
+
+.feedback-list-item {
+    font-size: 0.8em; /* Reduce the font size */
+    margin-bottom: 0.5em; /* Space between list items */
+}

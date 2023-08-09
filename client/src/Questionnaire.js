@@ -1,17 +1,44 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import './Questionnaire.css';
+import { questions } from './questions'; // Assuming questions.js is in the same directory
+import SWOTResults from './SWOTResults';
+import ActionPlan from './ActionPlan';
+// import { questionsRu } from './questions_ru'; // Assuming questions.js is in the same directory
+
 
 function Questionnaire() {
-    const [answers, setAnswers] = useState({
-        strength: "",
-        weakness: "",
-        opportunity: "",
-        threat: ""
-    });
+    const initialAnswers = questions.reduce((accum, question) => {
+        accum[question.key] = question.test_answer;
+        return accum;
+    }, {});
+
+    const [answers, setAnswers] = useState(initialAnswers);
+
+    const [isLoading, setIsLoading] = useState(false);
+
+
+    const handleInputChange = (index, value) => {
+
+        setAnswers((prevAnswers) => ({
+            ...prevAnswers,
+            [index]: value
+        }));
+    };
 
     const [errors, setErrors] = useState({});
 
-    const [feedback, setFeedback] = useState("");
+    const [feedback, setFeedback] = useState({
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: [],
+        action_plan: {
+            short_term: [],
+            mid_term: [],
+            long_term: [],
+        }
+    });
 
     const validateAnswers = () => {
         let validationErrors = {};
@@ -27,70 +54,57 @@ function Questionnaire() {
         return validationErrors;
     };
 
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setAnswers(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const validationErrors = validateAnswers();
-        if (Object.keys(validationErrors).length > 0) {
-            
-            setErrors(validationErrors);
-            return; // Exit if there are validation errors
-        }
+        setIsLoading(true);
 
         try {
-            const response = await fetch('/api/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(answers),
-            });
-            
-            const data = await response.json();
-            setFeedback("Your answers have been successfully submitted! Thank you." + data.message);
+
+
+            const response = await axios.post('/api/submit', answers);
+            const swotResult = JSON.parse(response.data.swotAnalysis.content);
+            const promptText = response.data.promptText;
+
+            // Display the result
+            setIsLoading(false);
+            setFeedback(swotResult);
         } catch (error) {
-            console.error("Error submitting questionnaire:", error);
+            setIsLoading(false);
+
+            console.error('Failed to generate SWOT analysis:', error);
+            setFeedback('There was an error generating the SWOT analysis. Please try again.');
         }
     };
 
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>
-                What do you believe your business excels at?
-                <textarea
-                    name="strength"
-                    value={answers.strength}
-                    onChange={handleChange}
-                />
-                {errors.strength && <p className="error-text">{errors.strength}</p>}
-            </label>
+        <form onSubmit={handleSubmit} className="questionnaire">
+            {questions.map((question) => (
+                <div key={question.id} className="question-item">
+                    <label htmlFor={`question-${question.id}`}>
+                        {question.prompt}
+                    </label>
 
-            <label>
-                What areas of your business do you feel need improvement?
-                <textarea
-                    name="weakness"
-                    value={answers.weakness}
-                    onChange={handleChange}
-                />
-                {errors.weakness && <p className="error-text">{errors.weakness}</p>}
-            </label>
+                    <textarea
+                        id={`question-${question.id}`}
+                        value={question.test_answer}
+                        onChange={(e) => handleInputChange(question.key, e.target.value)}
+                    />
 
-            {/* ... Add more questions similarly ... */}
+                </div>
+            ))}
 
-            <button type="submit">Submit</button>
-            <p className="feedback-text">{feedback}</p>
+            {!isLoading && <button type="submit">Submit</button>}
+            {isLoading &&
+                <div className="loading-container">
+                    <div className="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            }
+
+            <SWOTResults feedback={feedback} />
+            <ActionPlan actionPlan={feedback.action_plan} />
         </form>
-
-        
     );
 }
 
