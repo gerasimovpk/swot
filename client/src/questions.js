@@ -3,7 +3,15 @@ export const questions = [
         id: 1,
         key: "business scope",
         prompt: "Can you describe what your business does on a day-to-day basis?",
-        test_answer: "I'm a pastry cheif, working in my own workshop. I bake cakes, deserts by pre-order. I produce only classical natural deserts, without vegan or sugarl free options."
+        test_answer: "I'm a pastry cheif, working in my own workshop. I bake cakes, deserts by pre-order. I produce only classical natural deserts, without vegan or sugarl free options.",
+        suggestions: [
+            "Baking or Pastry Shop", 
+            "E-commerce Store", 
+            "Digital Marketing",
+            "Graphic Design",
+            "Fitness",
+            "Event Planning",
+        ]
     },
     {
         id: 2,
@@ -57,7 +65,7 @@ export const questions = [
         id: 10,
         key: "industry trends",
         prompt: "Are there any trends in your industry that you're excited about or think might impact your business?",
-        test_answer: "Same day delivery in mid market segment, unique custom made cakes for luxury events" 
+        test_answer: "Same day delivery in mid market segment, unique custom made cakes for luxury events"
     },
     {
         id: 11,

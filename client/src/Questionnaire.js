@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Questionnaire.css';
 import { questions } from './questions'; // Assuming questions.js is in the same directory
@@ -13,9 +13,16 @@ function Questionnaire() {
         return accum;
     }, {});
 
-    const [answers, setAnswers] = useState(initialAnswers);
+    // const [answers, setAnswers] = useState(initialAnswers);
+    const [answers, setAnswers] = useState({});
 
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (!areResultsEmpty()) {
+            scrollIntoResults();
+        }
+    }, [isLoading]);
 
 
     const handleInputChange = (index, value) => {
@@ -28,31 +35,19 @@ function Questionnaire() {
 
     const [errors, setErrors] = useState({});
 
-    const [feedback, setFeedback] = useState({
-        strengths: [],
-        weaknesses: [],
-        opportunities: [],
-        threats: [],
-        action_plan: {
-            short_term: [],
-            mid_term: [],
-            long_term: [],
-        }
-    });
+    const [results, setResults] = useState({});
 
-    const validateAnswers = () => {
-        let validationErrors = {};
-
-        if (!answers.strength.trim()) {
-            validationErrors.strength = "Please describe the strengths of your business.";
-        }
-        if (!answers.weakness.trim()) {
-            validationErrors.weakness = "Please describe the weaknesses of your business.";
-        }
-        // ... Add similar checks for other fields ...
-
-        return validationErrors;
+    const areResultsEmpty = () => {
+        return !results || Object.keys(results).length === 0;
     };
+
+    function handleChipClick(key, suggestion) {
+        setAnswers((answers) => ({
+            ...answers,
+            [key]: suggestion
+        }))
+    }
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -67,18 +62,22 @@ function Questionnaire() {
 
             // Display the result
             setIsLoading(false);
-            setFeedback(swotResult);
+            setResults(swotResult);
+
         } catch (error) {
             setIsLoading(false);
 
             console.error('Failed to generate SWOT analysis:', error);
-            setFeedback('There was an error generating the SWOT analysis. Please try again.');
         }
     };
 
+    const scrollIntoResults = () => {
+        const swotResults = document.getElementById("swot-results");
+        swotResults && swotResults.scrollIntoView({ behavior: "smooth" });
+    }
 
     return (
-        <form onSubmit={handleSubmit} className="questionnaire">
+        <form onSubmit={handleSubmit} className="questionnaire" id="questionnaire-section" >
             {questions.map((question) => (
                 <div key={question.id} className="question-item">
                     <label htmlFor={`question-${question.id}`}>
@@ -87,14 +86,23 @@ function Questionnaire() {
 
                     <textarea
                         id={`question-${question.id}`}
-                        value={question.test_answer}
+                        value={answers[question.key]}
                         onChange={(e) => handleInputChange(question.key, e.target.value)}
                     />
+
+                    <div className="chip-container">
+                        {question.suggestions && question.suggestions.map((suggestion, sIndex) => (
+                            <span key={sIndex} className="chip" onClick={() => handleChipClick(question.key, suggestion)}>
+                                {suggestion}
+                            </span>
+                        ))}
+                    </div>
 
                 </div>
             ))}
 
             {!isLoading && <button type="submit">Submit</button>}
+
             {isLoading &&
                 <div className="loading-container">
                     <div className="spinner"></div>
@@ -102,8 +110,12 @@ function Questionnaire() {
                 </div>
             }
 
-            <SWOTResults feedback={feedback} />
-            <ActionPlan actionPlan={feedback.action_plan} />
+            {!isLoading && !areResultsEmpty() && (
+                <div id="swot-results">
+                    <SWOTResults feedback={results} />
+                    <ActionPlan actionPlan={results.action_plan} />
+                </div>
+            )}
         </form>
     );
 }

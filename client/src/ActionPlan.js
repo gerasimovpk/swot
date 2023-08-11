@@ -8,32 +8,48 @@ const ActionPlan = ({ actionPlan }) => {
 
             <div className="plan-section">
                 <h3>Short Term</h3>
-                <ul>
-                    {actionPlan.short_term.map((item, index) => (
-                        <li key={index}>{item}</li>
-                    ))}
-                </ul>
+                {actionPlan.short_term.map((plan, index) => (
+                    <div key={index}>
+                        <h4>Priority: {plan.priority}</h4>
+                        <ul>
+                            {plan.actions.map((action, aIndex) => (
+                                <li key={aIndex}>{action}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
             </div>
 
             <div className="plan-section">
                 <h3>Mid Term</h3>
-                <ul>
-                    {actionPlan.mid_term.map((item, index) => (
-                        <li key={index}>{item}</li>
-                    ))}
-                </ul>
+                {actionPlan.mid_term.map((plan, index) => (
+                    <div key={index}>
+                        <h4>Priority: {plan.priority}</h4>
+                        <ul>
+                            {plan.actions.map((action, aIndex) => (
+                                <li key={aIndex}>{action}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
             </div>
 
             <div className="plan-section">
                 <h3>Long Term</h3>
-                <ul>
-                    {actionPlan.long_term.map((item, index) => (
-                        <li key={index}>{item}</li>
-                    ))}
-                </ul>
+                {actionPlan.long_term.map((plan, index) => (
+                    <div key={index}>
+                        <h4>Priority: {plan.priority}</h4>
+                        <ul>
+                            {plan.actions.map((action, aIndex) => (
+                                <li key={aIndex}>{action}</li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
             </div>
+
         </div>
-    ); 
+    );
 }
 
 export default ActionPlan;

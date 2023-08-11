@@ -1,4 +1,6 @@
 const express = require('express');
+const SWOT = require('./swotModel.js');
+
 require('dotenv').config();
 
 const { Configuration, OpenAIApi } = require("openai");
@@ -41,9 +43,18 @@ router.post('/api/submit', async (req, res) => {
                                 opportunities: [<array of strings>],
                                 threats: [<array of strings>],
                                 action_plan: {
-                                    short_term:  [<array of strings>],
-                                    mid_term:  [<array of strings>],
-                                    long_term:  [<array of strings>],
+                                    short_term: [{
+                                        "priority": <string>,
+                                        "actions: [<specific granular actions, array of strings>]
+                                    }],
+                                    mid_term: [{
+                                        "priority": <string>,
+                                        "actions: [<specific granular actions, array of strings>]
+                                    }],
+                                    long_term: [{
+                                        "priority": <string>,
+                                        "actions: [<specific granular actions, array of strings>]
+                                    }],
                                 }
                             }`
             }, {
@@ -54,6 +65,13 @@ router.post('/api/submit', async (req, res) => {
 
         const swotResult = completion.data.choices[0].message;
         res.json({ swotAnalysis: swotResult, promptText: promptText });
+
+        const swotInstance = new SWOT({
+            request: inputData,
+            response: JSON.parse(swotResult.content),
+        });
+
+        await swotInstance.save();
 
     } catch (error) {
         console.error('Error calling OpenAI API:', error);

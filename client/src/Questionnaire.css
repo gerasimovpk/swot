@@ -98,3 +98,18 @@ textarea {
         transform: rotate(360deg);
     }
 }
+
+.chip {
+    background-color: #3a3f49; /* Slightly lighter than the app background */
+    color: white;
+    padding: 8px 12px; /* Some padding for space */
+    border-radius: 16px; /* Rounded corners */
+    margin-right: 8px; /* Space between chips if you have multiple in a row */
+    display: inline-block; /* To keep them in a row */
+    cursor: pointer; /* To indicate interactivity */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.chip:hover {
+    background-color: #4a4f59; /* A bit lighter on hover */
+}
