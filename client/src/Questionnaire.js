@@ -44,7 +44,7 @@ function Questionnaire() {
 
     const handleBlur = (key, value) => {
         if (lastFetchedAnswers[key] !== value) {
-            fetchSuggestions({lastAnsweredQuestion: key});
+            fetchSuggestions({ lastAnsweredQuestion: key });
             setLastFetchedAnswers(prev => ({ ...prev, [key]: value }));
         }
     }
@@ -57,6 +57,46 @@ function Questionnaire() {
         return !results || Object.keys(results).length === 0;
     };
 
+    const getHumanReadableAddress = async (lat, long) => {
+        // TODO: check conditions for using this endpoint
+        const endpoint = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${long}&addressdetails=1`;
+        
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        
+        let city = '';
+        let country = '';
+
+        if (data && data.address) {
+            city = data.address.city || data.address.town || data.address.village || data.address.hamlet || '';
+            country = data.address.country || '';
+        }
+
+        return `${city}, ${country}`;
+    }
+    
+
+    const handleLocateMeClick = async () => {
+        if (!navigator.geolocation) {
+            setAnswers(prev => ({ ...prev, 'business location': 'Geolocation is not supported by your browser' }));
+            return;
+        }
+
+        const success = async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            const locationString = await getHumanReadableAddress(latitude, longitude);
+            setAnswers(prev => ({ ...prev, 'business location': locationString }));
+        }
+
+        const error = () => {
+            setAnswers(prev => ({ ...prev, 'business location': 'Unable to retrieve your location' }));
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error);
+    }
+
     function handleChipClick(key, suggestion) {
         setAnswers((prevAnswers) => ({
             ...prevAnswers,
@@ -65,36 +105,36 @@ function Questionnaire() {
 
         // Find the related question to get its index
         const relatedQuestionIndex = questions.findIndex(q => q.key === key);
-        
+
         // Use the ref to focus the textarea and set cursor to end
         const textArea = textAreaRefs.current[relatedQuestionIndex].current;
-        textArea.focus();
-        textArea.setSelectionRange(textArea.value.length, textArea.value.length);
-        
+        // textArea.focus();
+        // textArea.setSelectionRange(textArea.value.length, textArea.value.length);
+        // TODO: uncomment when bug with doubled suggestions is fixed
 
-        fetchSuggestions({lastAnsweredQuestion: key, lastAnswer: suggestion});
+        fetchSuggestions({ lastAnsweredQuestion: key, lastAnswer: suggestion });
     }
 
     function getNextKeys(currentKey) {
         // Find the index of the current question
         const currentIndex = questions.findIndex(question => question.key === currentKey);
-    
+
         // Handle case where the current key isn't found
         if (currentIndex === -1) return [];
-    
+
         // Get the keys of the next two questions if they exist
         const nextKeys = [];
-        
+
         if (questions[currentIndex + 1]) {
             nextKeys.push(questions[currentIndex + 1].key);
         }
-        
+
         // if (questions[currentIndex + 2]) {
         //     nextKeys.push(questions[currentIndex + 2].key);
         // }
-    
+
         return nextKeys;
-    }    
+    }
 
     const fetchSuggestions = async (params) => {
         try {
@@ -115,8 +155,8 @@ function Questionnaire() {
                 payload[key] = payload[key] || '';
             });
 
-            delete payload['business location'];
-            delete payload['business scope'];
+            // delete payload['business location'];
+            // delete payload['business scope'];
 
             const response = await axios.post('/api/newSuggestions', payload);
             if (response.data) {
@@ -130,13 +170,13 @@ function Questionnaire() {
                         } else {
                             merged[key] = newSuggestions[key];
                         }
-                        
+
                         merged[key] = merged[key].slice(-10);
 
                         return merged;
-                    }, {...prevSuggestions});
+                    }, { ...prevSuggestions });
                 });
-                
+
             }
         } catch (error) {
             console.error("Failed to fetch suggestions:", error);
@@ -188,11 +228,17 @@ function Questionnaire() {
                     />
 
                     <div className="chip-container">
-                        {suggestions[question.key] && suggestions[question.key].map((suggestion, sIndex) => (
-                            <span key={sIndex} className="chip" onClick={() => handleChipClick(question.key, suggestion)}>
-                                {suggestion}
+                        {question.key === "business location" ? (
+                            <span className="chip" onClick={handleLocateMeClick}>
+                                Locate me
                             </span>
-                        ))}
+                        ) : (
+                            suggestions[question.key] && suggestions[question.key].map((suggestion, sIndex) => (
+                                <span key={sIndex} className="chip" onClick={() => handleChipClick(question.key, suggestion)}>
+                                    {suggestion}
+                                </span>
+                            ))
+                        )}
                     </div>
 
                 </div>
@@ -209,6 +255,7 @@ function Questionnaire() {
 
             {!isLoading && !areResultsEmpty() && (
                 <div id="swot-results">
+                    <h1> {results.swot_scope} </h1>
                     <SWOTResults feedback={results} />
                     <ActionPlan actionPlan={results.action_plan} />
                 </div>

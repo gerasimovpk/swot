@@ -15,13 +15,16 @@ const router = express.Router();
 router.post('/api/newSuggestions', async (req, res) => {
     const inputData = req.body;
 
-    let promptText = `Take all keys from provided input. 
-                    Generate me short suggestions based on these answers: \r\n`;
+    let promptText = `In JSON there're user's answers about their business.
+    Generate short suggestions for potential user's answers where they're empty.  
+    Exclude keys which have non-empty values.: \r\n`;
 
-    for (let [key, value] of Object.entries(inputData)) {
-        promptText += `${key}: ${value}\r\n`;
-    }
+    // for (let [key, value] of Object.entries(inputData)) {
+        // promptText += `${key}: ${value}\r\n`;
+    // }
     // promptText += "I want results in Russian language.";
+
+    promptText += JSON.stringify(inputData);
 
     try {
         const completion = await openai.createChatCompletion({
@@ -37,8 +40,7 @@ router.post('/api/newSuggestions', async (req, res) => {
                             
                             }
 
-                            In your response you can use only keys contained in user request.
-                            In your response you can include only keys which have empty values in user request.
+                            In your response you can use only keys from initial user request, excluding keys which have values.                    
                             "key" should be exact the same as in user request, not modified, without case changes, or added underscores.
                             `
             }, {
@@ -60,9 +62,12 @@ router.post('/api/submit', async (req, res) => {
 
     let promptText = "I am analyzing a business based on the following inputs from it's owner: \r\n";
 
-    for (let [key, value] of Object.entries(inputData)) {
-        promptText += `${key}: ${value}\r\n`;
-    }
+    // for (let [key, value] of Object.entries(inputData)) {
+    //     promptText += `${key}: ${value}\r\n`;
+    // }
+
+    promptText += JSON.stringify(inputData);
+
 
     promptText += "Given these details, provide a SWOT analysis in a defined format. \r\n";
     promptText += "Avoid general conclusions or references, be specific and refer to the given case and given details.";
@@ -78,10 +83,12 @@ router.post('/api/submit', async (req, res) => {
                             She doesn't have extensive knowledge of SWOT analysis, so she requires clear explanations and actionable insights from the application.
                             She needs specific answers connected to her business.
                             
+                            Also, define swot_scope as you understood it.
                             Also, she needs short-term, mid-term and long-term action plan.
                             
                             I need a response in json format:
                             {
+                                swot_scope: <string>,
                                 strengths: [<array of strings>],
                                 weaknessess: [<array of strings>],
                                 opportunities: [<array of strings>],
