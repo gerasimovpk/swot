@@ -12,6 +12,48 @@ const openai = new OpenAIApi(configuration);
 
 const router = express.Router();
 
+router.post('/api/newSuggestions', async (req, res) => {
+    const inputData = req.body;
+
+    let promptText = `Take all keys from provided input. 
+                    Generate me short suggestions based on these answers: \r\n`;
+
+    for (let [key, value] of Object.entries(inputData)) {
+        promptText += `${key}: ${value}\r\n`;
+    }
+    // promptText += "I want results in Russian language.";
+
+    try {
+        const completion = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [{
+                "role": "system",
+                "content": `User is struggling to write everything manually.
+                            Based on the answers for some of the questions, I need very short suggestions for chips for other questions.
+                            
+                            I need a response in json format with the keys at the top level. for example:
+                            {
+                                "key": [<Array of strings> (can't be empty)]
+                            
+                            }
+                            
+                            In your response you can use only keys contained in user request.
+                            In your response you can include only keys which have empty values in user request.
+                            `
+            }, {
+                role: "user",
+                content: promptText
+            }],
+        });
+
+        const suggestions = completion.data.choices[0].message;
+        res.json({ suggestions: suggestions, promptText: promptText });
+    } catch (error) {
+        console.error('Error calling OpenAI API:', error);
+        res.status(500).json({ error: 'Failed to generate SWOT analysis.' });
+    }
+});
+
 router.post('/api/submit', async (req, res) => {
     const inputData = req.body;
 
@@ -34,7 +76,8 @@ router.post('/api/submit', async (req, res) => {
                             Ansewrs are intended for Small Business Owner/Entrepreneur. 
                             She doesn't have extensive knowledge of SWOT analysis, so she requires clear explanations and actionable insights from the application.
                             She needs specific answers connected to her business.
-                            She needs short-term, mid-term and long-term action plan.
+                            
+                            Also, she needs short-term, mid-term and long-term action plan.
                             
                             I need a response in json format:
                             {
