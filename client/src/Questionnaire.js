@@ -20,14 +20,12 @@ function Questionnaire() {
     const initialSuggestions = {
         "business scope": ["Baking or Pastry Shop", "E-commerce Store", "Digital Marketing", "Graphic Design", "Fitness", "Event Planning"],
     };
-
+    const [lastFetchedAnswers, setLastFetchedAnswers] = useState({});
     const [suggestions, setSuggestions] = useState(initialSuggestions);
 
     const textAreaRefs = useRef(questions.map(() => React.createRef()));
 
     const [isLoading, setIsLoading] = useState(false);
-
-    const [lastFetchedAnswers, setLastFetchedAnswers] = useState({});
 
     useEffect(() => {
         if (!areResultsEmpty()) {

@@ -36,9 +36,10 @@ router.post('/api/newSuggestions', async (req, res) => {
                                 "key": [<Array of strings> (can't be empty)]
                             
                             }
-                            
+
                             In your response you can use only keys contained in user request.
                             In your response you can include only keys which have empty values in user request.
+                            "key" should be exact the same as in user request, not modified, without case changes, or added underscores.
                             `
             }, {
                 role: "user",
