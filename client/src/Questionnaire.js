@@ -129,10 +129,6 @@ function Questionnaire() {
             nextKeys.push(questions[currentIndex + 1].key);
         }
 
-        // if (questions[currentIndex + 2]) {
-        //     nextKeys.push(questions[currentIndex + 2].key);
-        // }
-
         return nextKeys;
     }
 
@@ -154,9 +150,6 @@ function Questionnaire() {
             nextKeys.forEach(key => {
                 payload[key] = payload[key] || '';
             });
-
-            // delete payload['business location'];
-            // delete payload['business scope'];
 
             const response = await axios.post('/api/newSuggestions', payload);
             if (response.data) {
