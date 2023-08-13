@@ -10,7 +10,7 @@ const ActionPlan = ({ actionPlan }) => {
                 <h3>Short Term</h3>
                 {actionPlan.short_term.map((plan, index) => (
                     <div key={index}>
-                        <h4>Priority: {plan.priority}</h4>
+                        <h4>Priority: {plan.track}</h4>
                         <ul>
                             {plan.actions.map((action, aIndex) => (
                                 <li key={aIndex}>{action}</li>
@@ -24,7 +24,7 @@ const ActionPlan = ({ actionPlan }) => {
                 <h3>Mid Term</h3>
                 {actionPlan.mid_term.map((plan, index) => (
                     <div key={index}>
-                        <h4>Priority: {plan.priority}</h4>
+                        <h4>Priority: {plan.track}</h4>
                         <ul>
                             {plan.actions.map((action, aIndex) => (
                                 <li key={aIndex}>{action}</li>
@@ -38,7 +38,7 @@ const ActionPlan = ({ actionPlan }) => {
                 <h3>Long Term</h3>
                 {actionPlan.long_term.map((plan, index) => (
                     <div key={index}>
-                        <h4>Priority: {plan.priority}</h4>
+                        <h4>Priority: {plan.track}</h4>
                         <ul>
                             {plan.actions.map((action, aIndex) => (
                                 <li key={aIndex}>{action}</li>

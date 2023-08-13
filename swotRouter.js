@@ -15,33 +15,36 @@ const router = express.Router();
 router.post('/api/newSuggestions', async (req, res) => {
     const inputData = req.body;
 
-    let promptText = `In JSON there're user's answers about their business.
-    Generate short suggestions for potential user's answers where they're empty.  
-    Exclude keys which have non-empty values.: \r\n`;
+    // let promptText = `In JSON there're user's answers about their business.
+    // Generate short suggestions for potential user's answers where they're empty.  
+    // Exclude keys which have non-empty values.: \r\n`;
 
     // for (let [key, value] of Object.entries(inputData)) {
         // promptText += `${key}: ${value}\r\n`;
     // }
     // promptText += "I want results in Russian language.";
 
-    promptText += JSON.stringify(inputData);
+    let promptText = JSON.stringify(inputData);
 
     try {
         const completion = await openai.createChatCompletion({
             model: "gpt-3.5-turbo",
             messages: [{
                 "role": "system",
-                "content": `User is struggling to write everything manually.
-                            Based on the answers for some of the questions, I need very short suggestions for chips for other questions.
-                            
+                "content": `User is answering questions for SWOT analysis and struggling to write everything manually.
+                            I need to provide them with some chips with short examples how to answer the next question.
+                            I will provide you with a JSON message containing various keys. Some keys will have answers, while others will be empty. 
+                            Your task is to generate short examples for these chips, only including the keys with empty values.
+
                             I need a response in json format with the keys at the top level. for example:
                             {
-                                "key": [<Array of strings> (can't be empty)]
-                            
+                                "key": ["hint1", "hint2", ...]
                             }
-
-                            In your response you can use only keys from initial user request, excluding keys which have values.                    
-                            "key" should be exact the same as in user request, not modified, without case changes, or added underscores.
+                            
+                            I need 3-5 examples, each up to 3 words.
+                            You only generate examples for keys with empty values in incoming JSON.
+                            The key names in the response are exactly the same as in the incoming message, without any modifications.
+                            The examples are informed by the potential skill gaps: Scaling, diversifying offerings, managing finances, marketing, tech use, hiring, legal issues, delegation, time management, inventory management, customer relations, long-term planning, lack of training, decision-making. 
                             `
             }, {
                 role: "user",
@@ -95,15 +98,15 @@ router.post('/api/submit', async (req, res) => {
                                 threats: [<array of strings>],
                                 action_plan: {
                                     short_term: [{
-                                        "priority": <string>,
+                                        "track": <string>,
                                         "actions: [<specific granular actions, array of strings>]
                                     }],
                                     mid_term: [{
-                                        "priority": <string>,
+                                        "track": <string>,
                                         "actions: [<specific granular actions, array of strings>]
                                     }],
                                     long_term: [{
-                                        "priority": <string>,
+                                        "track": <string>,
                                         "actions: [<specific granular actions, array of strings>]
                                     }],
                                 }
